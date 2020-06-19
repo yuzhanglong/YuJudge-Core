@@ -5,7 +5,7 @@
  *
  *  项目日志记录模块
  */
-#include <sys/time.h>
+#include <time.h>
 #include <stdio.h>
 #include "logger.h"
 
@@ -15,9 +15,18 @@
  * 输出本日志的创建时间
  */
 void outputCurrentTime() {
-    time_t rawTime;
-    struct tm *currentTime = localtime(&rawTime);
-    printf("[%s]", asctime(currentTime));
+
+    time_t rawTime = time(NULL);
+    struct tm *currentTime;
+    currentTime = localtime(&rawTime);
+    printf("[%d-%d-%d %d:%d:%d]",
+           currentTime->tm_year + 1900,
+           currentTime->tm_mon + 1,
+           currentTime->tm_mday,
+           currentTime->tm_hour,
+           currentTime->tm_min,
+           currentTime->tm_sec
+    );
 }
 
 void outputLoggerType(logType type) {
@@ -42,7 +51,7 @@ void makeLog(logType type, char *content) {
     outputLoggerType(type);
     /*获取生成日志的时间*/
     outputCurrentTime();
-    printf("    %s", content);
+    printf("%s\n", content);
 };
 
 /**
