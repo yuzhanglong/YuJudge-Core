@@ -18,18 +18,17 @@
 
 int main(int argc, char *argv[]) {
     struct execConfig execConfig;
-    execConfig.memoryLimit = 100000000;
-    execConfig.timeLimit = 5;
-    execConfig.outputLimit = 100000000;
-    execConfig.processLimit = 1;
-    execConfig.wallTime = 10;
     execConfig.stdoutPath = "../tests/hello/hello-c/hello.out";
     execConfig.stdinPath = "../tests/hello/hello-c/hello.in";
     execConfig.execPath = "../tests/hello/hello-c/run";
     struct judgeResult judgeResult;
-    runJudger(&execConfig, &judgeResult);
+    initExecConfig(&execConfig);
 
-
+    if (validateForExecConfig(&execConfig)) {
+        runJudger(&execConfig, &judgeResult);
+    } else {
+        judgeResult.condtion = VALIDATE_ERROR;
+    }
     // 此处的stdout将被调用者处理 应该以json字符串形式表示
     printf("realTime: %llu  cpuTime: %llu  memory: %llu  condition: %d\n",
            judgeResult.realTimeCost,

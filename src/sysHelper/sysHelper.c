@@ -1,8 +1,3 @@
-//
-// Created by yuzhanglong on 2020/6/19.
-//
-
-
 #include <unistd.h>
 #include <signal.h>
 #include "sysHelper.h"

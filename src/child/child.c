@@ -1,14 +1,18 @@
-//
-// Created by yuzhanglong on 2020/6/19.
-//
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include "child.h"
+
 #include "../guard/guard.h"
 
+#define CHILD_EXIT exit
+
+/**
+ * @author yzl
+ * @param execConfig 用户提供的运行的配置
+ * @return void
+ * 向（子）进程设限，例如内存、输出限制等限制
+ */
 
 void setLimitation(struct execConfig *execConfig) {
     // 内存超限
@@ -16,21 +20,21 @@ void setLimitation(struct execConfig *execConfig) {
     maxMemory.rlim_cur = maxMemory.rlim_max = execConfig->memoryLimit;
 
     if (setrlimit(RLIMIT_AS, &maxMemory) != 0) {
-        //TODO：返回错误
+        CHILD_EXIT(SET_LIMIT_ERROR);
     }
 
     // 时间超限
     struct rlimit maxTime;
     maxTime.rlim_cur = maxTime.rlim_max = execConfig->timeLimit;
     if (setrlimit(RLIMIT_CPU, &maxTime) != 0) {
-        //TODO：返回错误
+        CHILD_EXIT(SET_LIMIT_ERROR);
     }
 
     // 进程超限
     struct rlimit maxProcessAmount;
     maxProcessAmount.rlim_cur = maxProcessAmount.rlim_max = execConfig->processLimit;
     if (setrlimit(RLIMIT_NPROC, &maxProcessAmount) != 0) {
-        //TODO：返回错误
+        CHILD_EXIT(SET_LIMIT_ERROR);
     }
 
 
@@ -38,10 +42,16 @@ void setLimitation(struct execConfig *execConfig) {
     struct rlimit maxOutput;
     maxOutput.rlim_cur = maxOutput.rlim_max = execConfig->outputLimit;
     if (setrlimit(RLIMIT_FSIZE, &maxOutput) != 0) {
-        //TODO：返回错误
+        CHILD_EXIT(SET_LIMIT_ERROR);
     }
 }
 
+/**
+ * @author yzl
+ * @param execConfig 用户提供的运行的配置
+ * @return void
+ * 在fork出孩子进程之后调用之 运行孩子进程（用户提交的代码会在这里被运行）
+ */
 
 void runChild(struct execConfig *execConfig) {
 
@@ -50,21 +60,23 @@ void runChild(struct execConfig *execConfig) {
 
     if (execConfig->stdinPath[0] != '\0') {
         inputFile = fopen(execConfig->stdinPath, "r");
+        if (!inputFile) {
+            CHILD_EXIT(INPUT_FILE_NOT_FOUND);
+        }
         int f = fileno(inputFile);
         dup2(f, STDIN_FILENO);
     }
     if (execConfig->stdoutPath[0] != '\0') {
         outputFile = fopen(execConfig->stdoutPath, "w");
+        if (!inputFile) {
+            CHILD_EXIT(CAN_NOT_MAKE_OUTPUT);
+        }
         int f2 = fileno(outputFile);
         dup2(f2, STDOUT_FILENO);
     }
     setLimitation(execConfig);
     setSeccompGuard();
-
+    // 执行用户的提交
     execve(execConfig->execPath, NULL, NULL);
-
-    // 成功退出子进程
-    fclose(inputFile);
-    fclose(outputFile);
-    exit(EXIT_SUCCESS);
+    CHILD_EXIT(EXIT_SUCCESS);
 }

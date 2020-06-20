@@ -1,9 +1,8 @@
-//
-// Created by yuzhanglong on 2020/6/19.
-//
-
 #include <stdio.h>
 #include "common.h"
+
+#define VALIDATE_CONFIG_ERROR 0
+#define VALIDATE_SUCCESS 1
 
 void showUsage() {
     printf("[程序限制相关]\n");
@@ -18,4 +17,37 @@ void showUsage() {
   -o, --stdout=TIME    标准输出文件\n\
   -e, --stderr=TIME     标准错误文件\n\
   -i, --stdin=SIZE     标准输入文件\n");
+}
+
+/**
+ * @author yzl
+ * @param execConfig 运行配置
+ * @return void
+ * 初始化用户配置
+ */
+
+void initExecConfig(struct execConfig *execConfig) {
+    execConfig->memoryLimit = MEMORY_LIMIT_DEFAULT;
+    execConfig->timeLimit = TIME_LIMIT_DEFAULT;
+    execConfig->wallTime = WALL_TIME_DEFAULT;
+    execConfig->processLimit = PROCESS_LIMIT_DEFAULT;
+    execConfig->outputLimit = OUTPUT_LIMIT_DEFAULT;
+}
+
+/**
+ * @author yzl
+ * @param execConfig 用户提供的运行的配置
+ * @return void
+ * 验证用户配置的合法性
+ */
+
+int validateForExecConfig(struct execConfig *execConfig) {
+    if (execConfig->timeLimit < 0
+        || execConfig->memoryLimit < 1024
+        || execConfig->wallTime < 0
+        || execConfig->processLimit < 0
+        || execConfig->outputLimit < 0) {
+        return VALIDATE_CONFIG_ERROR;
+    }
+    return VALIDATE_SUCCESS;
 }

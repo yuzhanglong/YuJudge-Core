@@ -1,8 +1,3 @@
-//
-// Created by yuzhanglong on 2020/6/20.
-//
-
-
 #include "guard.h"
 
 int ALLOW_LIST[] = {
@@ -13,12 +8,23 @@ int ALLOW_LIST[] = {
         SCMP_SYS(kill)
 };
 
+
+/**
+ * @author yzl
+ * @return int
+ * 获取白名单的长度
+ */
 int getAllowListLength() {
     int len = sizeof(ALLOW_LIST) / sizeof(int);
     return len;
 }
 
-
+/**
+ * @author yzl
+ * @param ctx scmp_filter_ctx
+ * @return int
+ * 添加限制规则
+ */
 int addSeccompRules(scmp_filter_ctx ctx) {
     int len = getAllowListLength();
     for (int i = 0; i < len; i++) {
@@ -29,6 +35,11 @@ int addSeccompRules(scmp_filter_ctx ctx) {
     return 1;
 }
 
+/**
+ * @author yzl
+ * @return int
+ * 执行规则限制
+ */
 void setSeccompGuard() {
     scmp_filter_ctx ctx;
     ctx = seccomp_init(SCMP_ACT_ALLOW);
