@@ -57,6 +57,7 @@ void runChild(struct execConfig *execConfig) {
 
     FILE *inputFile = NULL;
     FILE *outputFile = NULL;
+    FILE *errFile = NULL;
 
     if (execConfig->stdinPath[0] != '\0') {
         inputFile = fopen(execConfig->stdinPath, "r");
@@ -73,6 +74,14 @@ void runChild(struct execConfig *execConfig) {
         }
         int f2 = fileno(outputFile);
         dup2(f2, STDOUT_FILENO);
+    }
+    if (execConfig->stderrPath[0] != '\0') {
+        errFile = fopen(execConfig->stderrPath, "w");
+        if (!inputFile) {
+            CHILD_EXIT(CAN_NOT_MAKE_OUTPUT);
+        }
+        int f3 = fileno(errFile);
+        dup2(f3, STDERR_FILENO);
     }
     setLimitation(execConfig);
     setSeccompGuard();

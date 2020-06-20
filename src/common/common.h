@@ -23,8 +23,8 @@ enum RUNNING_CONDITION {
 };
 
 enum EXEC_SETTIN_DEFAULT {
-    TIME_LIMIT_DEFAULT = 1024,
-    MEMORY_LIMIT_DEFAULT = 1024 * 2000, // 2000kb
+    TIME_LIMIT_DEFAULT = 4,
+    MEMORY_LIMIT_DEFAULT = 1024 * 1024 * 32, // 2000kb
     WALL_TIME_DEFAULT = 6,
     PROCESS_LIMIT_DEFAULT = 1,
     OUTPUT_LIMIT_DEFAULT = 100000000,
@@ -44,6 +44,7 @@ struct execConfig {
     char *execPath;
     char *stdinPath;
     char *stdoutPath;
+    char *stderrPath;
 };
 
 struct judgeResult {
@@ -56,5 +57,7 @@ struct judgeResult {
 void initExecConfig(struct execConfig *execConfig);
 
 int validateForExecConfig(struct execConfig *execConfig);
+
+void showUsage();
 
 #endif //Y_JUDGER_COMMON_H
