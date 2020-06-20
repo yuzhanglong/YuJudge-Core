@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "child.h"
+#include "../guard/guard.h"
 
 
 void setLimitation(struct execConfig *execConfig) {
@@ -43,7 +44,7 @@ void setLimitation(struct execConfig *execConfig) {
 
 
 void runChild(struct execConfig *execConfig) {
-    setLimitation(execConfig);
+
     FILE *inputFile = NULL;
     FILE *outputFile = NULL;
 
@@ -57,7 +58,13 @@ void runChild(struct execConfig *execConfig) {
         int f2 = fileno(outputFile);
         dup2(f2, STDOUT_FILENO);
     }
+    setLimitation(execConfig);
+    setSeccompGuard();
+
     execve(execConfig->execPath, NULL, NULL);
+
     // 成功退出子进程
+    fclose(inputFile);
+    fclose(outputFile);
     exit(EXIT_SUCCESS);
 }

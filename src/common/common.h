@@ -9,9 +9,7 @@
 #include <sys/resource.h>
 
 enum JUDGE_CONDITION {
-    ACCEPTED = 1, // 程序通过
-    COMPILE_ERROR, // 编译错误
-    WRONG_ANSWER,  // 答案错误
+    RUN_SUCCESS = 1, // 程序通过
     RUNTIME_ERROR, // 运行时错误
     TIME_LIMIT_EXCEEDED, // 时间超限
     MEMORY_LIMIT_EXCEED, // 内存超限
@@ -31,6 +29,7 @@ struct execConfig {
     rlim_t memoryLimit;
     rlim_t processLimit;
     rlim_t outputLimit;
+    rlim_t wallTime;
     char *execPath;
     char *stdinPath;
     char *stdoutPath;

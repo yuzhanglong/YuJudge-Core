@@ -32,7 +32,7 @@ enum JUDGE_CONDITION getJudgeConditon(int status, struct rusage costResource, st
     // 正常返回
     if (WIFEXITED(status)) {
         // 注意：此处的accept并不是真正的accept
-        return ACCEPTED;
+        return RUN_SUCCESS;
     }
     if (WIFSIGNALED(status)) {
 
@@ -81,7 +81,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         // 父亲进程
         makeLog(DEBUG, "父进程已创建");
         struct timeoutkillerConfig killerConfig;
-        killerConfig.limitTime = 10;
+        killerConfig.limitTime = execConfig->wallTime;
         killerConfig.pid = childPid;
 
         // 若线程创建成功，则返回0。若线程创建失败，则返回出错编号
@@ -111,7 +111,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         judgeResult->realTimeCost = timeCostInMillisecond;
         judgeResult->condtion = getJudgeConditon(status, costResource, execConfig);
         //WARNING：ru_maxrss的值在mac和linux有区别！
-        judgeResult->memoryCost = costResource.ru_maxrss / 1024;
+        judgeResult->memoryCost = costResource.ru_maxrss;
 
 
         //TODO:处理status 捕捉退出信号 并根据080/8/8信号 来判断退出的情况

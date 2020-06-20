@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(y_judger C)
 LINK_LIBRARIES("pthread")
+LINK_LIBRARIES("seccomp")
 set(CMAKE_C_STANDARD 99)
 add_executable(
         y_judger
@@ -17,4 +18,5 @@ add_executable(
         src/child/child.h
         src/judger/judger.c
         src/judger/judger.h
-)
+        src/guard/guard.c
+        src/guard/guard.h)
