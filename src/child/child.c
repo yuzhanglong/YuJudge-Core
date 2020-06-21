@@ -25,7 +25,7 @@ void setLimitation(struct execConfig *execConfig) {
 
     // 时间超限
     struct rlimit maxTime;
-    maxTime.rlim_cur = maxTime.rlim_max = execConfig->timeLimit;
+    maxTime.rlim_cur = maxTime.rlim_max = execConfig->cpuTimeLimit;
     if (setrlimit(RLIMIT_CPU, &maxTime) != 0) {
         CHILD_EXIT(SET_LIMIT_ERROR);
     }

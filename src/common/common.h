@@ -36,11 +36,11 @@ struct timeoutkillerConfig {
 };
 
 struct execConfig {
-    rlim_t timeLimit;
+    rlim_t cpuTimeLimit;
     rlim_t memoryLimit;
     rlim_t processLimit;
     rlim_t outputLimit;
-    rlim_t wallTime;
+    rlim_t realTimeLimit;
     char *execPath;
     char *stdinPath;
     char *stdoutPath;
@@ -59,5 +59,9 @@ void initExecConfig(struct execConfig *execConfig);
 int validateForExecConfig(struct execConfig *execConfig);
 
 void showUsage();
+
+int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig);
+
+void generateResult(struct execConfig *execConfig, struct judgeResult *judgeResult);
 
 #endif //Y_JUDGER_COMMON_H

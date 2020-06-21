@@ -1,7 +1,7 @@
 /**
  *  @author:yuzhanglong
  *  @email:yuzl1123@163.com
- *  @version: demo-test
+ *  @version: 1.0
  *
  *
  *  注意：请在linux系统下调试运行，切记切记！
@@ -12,7 +12,7 @@
  *  另外，在调试的时候请使用日志记录（当然可以printf，但是在生产环境下不建议）
  *
  */
-#include <stdio.h>
+#include "common/common.h"
 #include "judger/judger.h"
 
 
@@ -20,33 +20,13 @@ int main(int argc, char *argv[]) {
     struct execConfig execConfig;
     struct judgeResult judgeResult;
     initExecConfig(&execConfig);
-//    showUsage();
-    execConfig.stdoutPath = "../tests/hello/hello-c/hello.out";
-    execConfig.stdinPath = "../tests/hello/hello-c/hello.in";
-    execConfig.stderrPath = "../tests/hello/hello-c/hello.err";
-    execConfig.execPath = "../tests/hello/hello-c/run";
-    if (validateForExecConfig(&execConfig)) {
-        runJudger(&execConfig, &judgeResult);
-    } else {
-        judgeResult.condtion = VALIDATE_ERROR;
+    if (getAndSetOptions(argc, argv, &execConfig)) {
+        if (validateForExecConfig(&execConfig)) {
+            runJudger(&execConfig, &judgeResult);
+        } else {
+            judgeResult.condtion = VALIDATE_ERROR;
+        }
     }
-    // 此处的stdout将被调用者处理 应该以json字符串形式表示
-    printf("{\n"
-           "    \"realTime\": %llu,\n"
-           "    \"cpuTime\": %llu,\n"
-           "    \"memory\": %llu,\n"
-           "    \"condition\": %d,\n"
-           "    \"stdinPath\": \"%s\",\n"
-           "    \"stdoutPath\": \"%s\",\n"
-           "    \"stderrPath\": \"%s\"\n"
-           "}\n",
-           judgeResult.realTimeCost,
-           judgeResult.cpuTimeCost,
-           judgeResult.memoryCost,
-           judgeResult.condtion,
-           execConfig.stdinPath,
-           execConfig.stderrPath,
-           execConfig.stdoutPath
-    );
+    generateResult(&execConfig, &judgeResult);
     return 0;
 }

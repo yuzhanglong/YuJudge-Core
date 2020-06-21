@@ -112,9 +112,9 @@ sudo ./y-judger
 
 ```json
 {
-    "realTime": 1,
-    "cpuTime": 0,
-    "memory": 552,
+    "realTimeCost": 1,
+    "cpuTimeCost": 0,
+    "memoryCost": 552,
     "condition": 1,
     "stdinPath": "../tests/hello/hello-c/hello.in",
     "stdoutPath": "../tests/hello/hello-c/hello.err",
