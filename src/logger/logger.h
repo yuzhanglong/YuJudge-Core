@@ -12,6 +12,6 @@ typedef int logType;
 #define INFO        2
 #define DEBUG       1
 
-void makeLog(logType type, char *content);
+void makeLog(logType type, char *content, FILE *loggerFile);
 
 #endif //Y_JUDGER_LOGGER_H

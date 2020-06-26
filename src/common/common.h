@@ -1,7 +1,7 @@
 #ifndef Y_JUDGER_COMMON_H
 #define Y_JUDGER_COMMON_H
 
-
+#include <stdio.h>
 #include <sys/resource.h>
 
 enum RUNNING_CONDITION {
@@ -45,6 +45,8 @@ struct execConfig {
     char *stdinPath;
     char *stdoutPath;
     char *stderrPath;
+    char *loggerPath;
+    FILE *loggerFile;
 };
 
 struct judgeResult {

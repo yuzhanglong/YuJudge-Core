@@ -16,12 +16,13 @@ void showUsage() {
   -t,     限制实际时间为t秒，请注意和cpu时间区分\n\
   -c,     限制cpu时间为t秒\n\
   -m,     限制运行内存为mKB\n\
-  -f,     限制代码最大输出为f B\n");
+  -f,     限制代码最大输出为fB\n");
 
     printf("[输入/输出相关]\n");
 
     printf("\
   -r,     目标可执行文件\n\
+  -l,     日志文件\n\
   -o,     标准输出文件\n\
   -e,     标准错误文件\n\
   -i,     标准输入文件\n");
@@ -86,7 +87,7 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
         showUsage();
         return 0;
     }
-    while ((opt = getopt(argc, argv, "t:c:m:f:o:e:i:r:h")) != -1) {
+    while ((opt = getopt(argc, argv, "t:c:m:f:o:e:i:r:l:h")) != -1) {
         switch (opt) {
             case 't':
                 execConfig->realTimeLimit = atoi(optarg);
@@ -112,6 +113,9 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
             case 'r':
                 execConfig->execPath = optarg;
                 break;
+            case 'l':
+                execConfig->loggerPath = optarg;
+                execConfig->loggerFile = fopen(execConfig->loggerPath, "w");
             case 'h':
                 showUsage();
                 return 0;
@@ -124,7 +128,7 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
 }
 
 void generateResult(struct execConfig *execConfig, struct judgeResult *judgeResult) {
-// 此处的stdout将被调用者处理 应该以json字符串形式表示
+    // 此处的stdout将被调用者处理 应该以json字符串形式表示
     printf("{\n"
            "    \"realTimeCost\": %llu,\n"
            "    \"cpuTimeCost\": %llu,\n"
@@ -132,7 +136,8 @@ void generateResult(struct execConfig *execConfig, struct judgeResult *judgeResu
            "    \"condition\": %d,\n"
            "    \"stdinPath\": \"%s\",\n"
            "    \"stdoutPath\": \"%s\",\n"
-           "    \"stderrPath\": \"%s\"\n"
+           "    \"stderrPath\": \"%s\",\n"
+           "    \"loggerPath\": \"%s\"\n"
            "}\n",
            judgeResult->realTimeCost,
            judgeResult->cpuTimeCost,
@@ -140,6 +145,7 @@ void generateResult(struct execConfig *execConfig, struct judgeResult *judgeResu
            judgeResult->condtion,
            execConfig->stdinPath,
            execConfig->stdoutPath,
-           execConfig->stderrPath
+           execConfig->stderrPath,
+           execConfig->loggerPath
     );
 }

@@ -16,15 +16,15 @@
  * 创建一个监控线程
  */
 
-void *monitorThread(void *timeoutkillerConfig) {
+void *monitorThread(void *timeoutkillerConfig, struct execConfig *execConfig) {
     struct timeoutkillerConfig *timeConf = (struct timeoutkillerConfig *) (timeoutkillerConfig);
     // 单独的线程 用来在超时的时候杀死进程 防止超时
     pid_t pid = timeConf->pid;
     int limitTime = timeConf->limitTime;
-    makeLog(DEBUG, "监控线程已开启");
+    makeLog(DEBUG, "监控线程已开启", execConfig->loggerFile);
     sleep((unsigned int) (limitTime));
     killPid(pid, SIGKILL);
-    makeLog(DEBUG, "运行超时");
+    makeLog(DEBUG, "运行超时", execConfig->loggerFile);
     return NULL;
 }
 
@@ -81,7 +81,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
     struct timeval startTime, endTime;
     gettimeofday(&startTime, NULL);
     if (!isRoot()) {
-        makeLog(WARNING, "非root用户");
+        makeLog(WARNING, "非root用户", execConfig->loggerFile);
         judgeResult->condtion = UNROOT_USER;
         return;
     }
@@ -90,7 +90,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
 
     if (childPid < 0) {
         //如果出现错误，fork返回一个负值
-        makeLog(ERROR, "fork error!");
+        makeLog(ERROR, "fork error!", execConfig->loggerFile);
         judgeResult->condtion = FORK_ERROR;
         return;
     }
@@ -100,7 +100,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
 
     if (childPid > 0) {
         // 父亲进程
-        makeLog(DEBUG, "父进程已创建");
+        makeLog(DEBUG, "父进程已创建", execConfig->loggerFile);
         struct timeoutkillerConfig killerConfig;
         killerConfig.limitTime = execConfig->realTimeLimit;
         killerConfig.pid = childPid;
@@ -118,7 +118,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         wait4(childPid, &status, WSTOPPED, &costResource);
         // 销毁监控进程
         pthread_cancel(pthread);
-        makeLog(DEBUG, "监控线程被销毁");
+        makeLog(DEBUG, "监控线程被销毁", execConfig->loggerFile);
 
         gettimeofday(&endTime, NULL);
         int timeCostInMillisecond = getGapMillsecond(startTime, endTime);

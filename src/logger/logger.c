@@ -14,43 +14,44 @@
  * @author yzl
  * 输出本日志的创建时间
  */
-void outputCurrentTime() {
+void outputCurrentTime(FILE *loggerFile) {
 
     time_t rawTime = time(NULL);
     struct tm *currentTime;
     currentTime = localtime(&rawTime);
-    printf("[%d-%d-%d %d:%d:%d]",
-           currentTime->tm_year + 1900,
-           currentTime->tm_mon + 1,
-           currentTime->tm_mday,
-           currentTime->tm_hour,
-           currentTime->tm_min,
-           currentTime->tm_sec
+    fprintf(loggerFile, "[%d-%d-%d %d:%d:%d]",
+            currentTime->tm_year + 1900,
+            currentTime->tm_mon + 1,
+            currentTime->tm_mday,
+            currentTime->tm_hour,
+            currentTime->tm_min,
+            currentTime->tm_sec
     );
 }
 
-void outputLoggerType(logType type) {
-    printf("[");
+void outputLoggerType(logType type, FILE *loggerFile) {
+    fprintf(loggerFile, "[");
     if (type == DEBUG) {
-        printf("DEBUG");
+        fprintf(loggerFile, "DEBUG");
     } else if (type == INFO) {
-        printf("INFO");
+        fprintf(loggerFile, "INFO");
     } else if (type == WARNING) {
-        printf("WARNING");
+        fprintf(loggerFile, "WARNING");
     } else if (type == ERROR) {
-        printf("ERROR");
+        fprintf(loggerFile, "ERROR");
     } else if (type == FATAL) {
-        printf("FATAL");
+        fprintf(loggerFile, "FATAL");
     }
-    printf("]");
+    fprintf(loggerFile, "]");
 }
 
 
-void makeLog(logType type, char *content) {
+void makeLog(logType type, char *content, FILE *loggerFile) {
+    if (loggerFile == NULL) return;
     /*输出类型*/
-    outputLoggerType(type);
+    outputLoggerType(type, loggerFile);
     /*获取生成日志的时间*/
-    outputCurrentTime();
+    outputCurrentTime(loggerFile);
     printf("%s\n", content);
 };
 
