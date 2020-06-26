@@ -19,12 +19,12 @@
 int main(int argc, char *argv[]) {
     struct execConfig execConfig;
     struct judgeResult judgeResult;
-    initExecConfig(&execConfig);
+    initExecConfigAndJudgeResult(&execConfig, &judgeResult);
     if (getAndSetOptions(argc, argv, &execConfig)) {
         if (validateForExecConfig(&execConfig)) {
             runJudger(&execConfig, &judgeResult);
         } else {
-            judgeResult.condtion = VALIDATE_ERROR;
+            judgeResult.condition = VALIDATE_ERROR;
         }
     }
     generateResult(&execConfig, &judgeResult);

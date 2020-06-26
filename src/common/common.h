@@ -53,10 +53,10 @@ struct judgeResult {
     rlim_t realTimeCost;
     rlim_t memoryCost;
     rlim_t cpuTimeCost;
-    int condtion;
+    int condition;
 };
 
-void initExecConfig(struct execConfig *execConfig);
+void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeResult *judgeResult);
 
 int validateForExecConfig(struct execConfig *execConfig);
 

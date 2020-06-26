@@ -39,7 +39,7 @@ void showUsage() {
  * 初始化用户配置
  */
 
-void initExecConfig(struct execConfig *execConfig) {
+void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeResult *judgeResult) {
     execConfig->memoryLimit = MEMORY_LIMIT_DEFAULT;
     execConfig->cpuTimeLimit = TIME_LIMIT_DEFAULT;
     execConfig->realTimeLimit = WALL_TIME_DEFAULT;
@@ -50,6 +50,10 @@ void initExecConfig(struct execConfig *execConfig) {
     execConfig->stdoutPath = "\0";
     execConfig->stdinPath = "\0";
     execConfig->execPath = "\0";
+    judgeResult->condition = 1;
+    judgeResult->memoryCost = 0;
+    judgeResult->realTimeCost = 0;
+    judgeResult->cpuTimeCost = 0;
 }
 
 /**
@@ -142,7 +146,7 @@ void generateResult(struct execConfig *execConfig, struct judgeResult *judgeResu
            judgeResult->realTimeCost,
            judgeResult->cpuTimeCost,
            judgeResult->memoryCost,
-           judgeResult->condtion,
+           judgeResult->condition,
            execConfig->stdinPath,
            execConfig->stdoutPath,
            execConfig->stderrPath,

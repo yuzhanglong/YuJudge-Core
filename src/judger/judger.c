@@ -16,15 +16,13 @@
  * 创建一个监控线程
  */
 
-void *monitorThread(void *timeoutkillerConfig, struct execConfig *execConfig) {
+void *monitorThread(void *timeoutkillerConfig) {
     struct timeoutkillerConfig *timeConf = (struct timeoutkillerConfig *) (timeoutkillerConfig);
     // 单独的线程 用来在超时的时候杀死进程 防止超时
     pid_t pid = timeConf->pid;
     int limitTime = timeConf->limitTime;
-    makeLog(DEBUG, "监控线程已开启", execConfig->loggerFile);
     sleep((unsigned int) (limitTime));
     killPid(pid, SIGKILL);
-    makeLog(DEBUG, "运行超时", execConfig->loggerFile);
     return NULL;
 }
 
@@ -82,7 +80,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
     gettimeofday(&startTime, NULL);
     if (!isRoot()) {
         makeLog(WARNING, "非root用户", execConfig->loggerFile);
-        judgeResult->condtion = UNROOT_USER;
+        judgeResult->condition = UNROOT_USER;
         return;
     }
     pid_t childPid = fork();
@@ -91,7 +89,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
     if (childPid < 0) {
         //如果出现错误，fork返回一个负值
         makeLog(ERROR, "fork error!", execConfig->loggerFile);
-        judgeResult->condtion = FORK_ERROR;
+        judgeResult->condition = FORK_ERROR;
         return;
     }
     if (childPid == 0) {
@@ -108,7 +106,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         // 若线程创建成功，则返回0。若线程创建失败，则返回出错编号
         int t = pthread_create(&pthread, NULL, monitorThread, (void *) (&killerConfig));
         if (t != 0) {
-            judgeResult->condtion = CREATE_THREAD_ERROR;
+            judgeResult->condition = CREATE_THREAD_ERROR;
             return;
         }
         int status = 0;
@@ -127,7 +125,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         int cpuTime = (int) (costResource.ru_utime.tv_sec * 1000 + costResource.ru_utime.tv_usec / 1000);
         judgeResult->cpuTimeCost = cpuTime;
         judgeResult->realTimeCost = timeCostInMillisecond;
-        judgeResult->condtion = getRunningConditon(status, costResource, execConfig);
+        judgeResult->condition = getRunningConditon(status, costResource, execConfig);
         //WARNING：ru_maxrss的值在mac和linux有区别！
         judgeResult->memoryCost = costResource.ru_maxrss;
     }
