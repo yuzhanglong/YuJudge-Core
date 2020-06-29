@@ -49,7 +49,9 @@ void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeRes
     execConfig->stderrPath = "\0";
     execConfig->stdoutPath = "\0";
     execConfig->stdinPath = "\0";
+    execConfig->loggerPath = "\0";
     execConfig->execPath = "\0";
+    execConfig->loggerFile = NULL;
     judgeResult->condition = 1;
     judgeResult->memoryCost = 0;
     judgeResult->realTimeCost = 0;
