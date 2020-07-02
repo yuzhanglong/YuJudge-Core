@@ -57,6 +57,11 @@ enum RUNNING_CONDITION getRunningConditon(int status, struct rusage costResource
             return SEGMENTATION_FAULT;
         }
         if (WTERMSIG(status) == SIGKILL) {
+            // 经测试 cpu的时间超限也会出现在此处
+            int cpuTime = (int) (costResource.ru_utime.tv_sec * 1000 + costResource.ru_utime.tv_usec / 1000);
+            if (execConfig->cpuTimeLimit < cpuTime) {
+                return TIME_LIMIT_EXCEEDED;
+            }
             return RUNTIME_ERROR;
         }
         if (WTERMSIG(status) == SIGXFSZ) {
