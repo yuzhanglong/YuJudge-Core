@@ -102,10 +102,10 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
                 execConfig->cpuTimeLimit = atoi(optarg);
                 break;
             case 'm':
-                execConfig->memoryLimit = atoi(optarg);
+                execConfig->memoryLimit = atoi(optarg) * 1024;
                 break;
             case 'f':
-                execConfig->memoryLimit = atoi(optarg) * 1024;
+                execConfig->outputLimit = atoi(optarg);
                 break;
             case 'o':
                 execConfig->stdoutPath = optarg;

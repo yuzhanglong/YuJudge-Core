@@ -84,7 +84,7 @@ void runChild(struct execConfig *execConfig) {
         dup2(f3, STDERR_FILENO);
     }
     setLimitation(execConfig);
-    setSeccompGuard();
+//    setSeccompGuard();
     // 执行用户的提交
     execve(execConfig->execPath, NULL, NULL);
     CHILD_EXIT(EXIT_SUCCESS);
