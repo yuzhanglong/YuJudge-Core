@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 2.8)
 project(y_judger C)
 LINK_LIBRARIES("pthread")
 LINK_LIBRARIES("seccomp")
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_FLAGS "-O3 -std=gnu99 -pie -fPIC -pthread")
 add_executable(
         y_judger
         src/main.c
