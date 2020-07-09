@@ -84,7 +84,10 @@ void runChild(struct execConfig *execConfig) {
         dup2(f3, STDERR_FILENO);
     }
     setLimitation(execConfig);
-//    setSeccompGuard();
+
+    // TODO: 目前安全性的实现还有一些问题，暂时注释
+    // setSeccompGuard();
+
     // 执行用户的提交
     execve(execConfig->execPath, NULL, NULL);
     CHILD_EXIT(EXIT_SUCCESS);

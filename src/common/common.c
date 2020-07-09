@@ -71,9 +71,7 @@ int validateForExecConfig(struct execConfig *execConfig) {
         || execConfig->realTimeLimit < 0
         || execConfig->processLimit < 0
         || execConfig->outputLimit < 0
-        || execConfig->execPath[0] == '\0'
-        || execConfig->stdoutPath[0] == '\0'
-        || execConfig->stdinPath[0] == '\0') {
+        || execConfig->execPath[0] == '\0') {
         return VALIDATE_CONFIG_ERROR;
     }
     return VALIDATE_SUCCESS;
