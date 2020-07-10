@@ -69,7 +69,7 @@ void runChild(struct execConfig *execConfig) {
     }
     if (execConfig->stdoutPath[0] != '\0') {
         outputFile = fopen(execConfig->stdoutPath, "w");
-        if (!inputFile) {
+        if (!outputFile) {
             CHILD_EXIT(CAN_NOT_MAKE_OUTPUT);
         }
         int f2 = fileno(outputFile);
@@ -77,7 +77,7 @@ void runChild(struct execConfig *execConfig) {
     }
     if (execConfig->stderrPath[0] != '\0') {
         errFile = fopen(execConfig->stderrPath, "w");
-        if (!inputFile) {
+        if (!errFile) {
             CHILD_EXIT(CAN_NOT_MAKE_OUTPUT);
         }
         int f3 = fileno(errFile);
