@@ -45,6 +45,7 @@ void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeRes
     execConfig->realTimeLimit = WALL_TIME_DEFAULT;
     execConfig->processLimit = PROCESS_LIMIT_DEFAULT;
     execConfig->outputLimit = OUTPUT_LIMIT_DEFAULT;
+    execConfig->wallMemoryLimit = WALL_MEMORY_DEFAULT;
     execConfig->execPath = "\0";
     execConfig->stderrPath = "\0";
     execConfig->stdoutPath = "\0";
@@ -100,7 +101,7 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
                 execConfig->cpuTimeLimit = atoi(optarg);
                 break;
             case 'm':
-                execConfig->memoryLimit = atoi(optarg) * 1024;
+                execConfig->memoryLimit = atoi(optarg);
                 break;
             case 'f':
                 execConfig->outputLimit = atoi(optarg);

@@ -7,7 +7,7 @@
 enum RUNNING_CONDITION {
     RUN_SUCCESS = 1, // 程序通过
     RUNTIME_ERROR, // 运行时错误
-    TIME_LIMIT_EXCEEDED, // 时间超限
+    TIME_LIMIT_EXCEED, // 时间超限
     MEMORY_LIMIT_EXCEED, // 内存超限
     OUTPUT_LIMIT_EXCEED, // 输出超过限制
     SEGMENTATION_FAULT,  // 段错误
@@ -22,12 +22,14 @@ enum RUNNING_CONDITION {
     VALIDATE_ERROR // 数据验证失败
 };
 
+// 对于内存限制的一些实践和解释请参考child.c
 enum EXEC_SETTIN_DEFAULT {
-    TIME_LIMIT_DEFAULT = 4,
-    MEMORY_LIMIT_DEFAULT = 1024 * 1024 * 32, // 2000kb
-    WALL_TIME_DEFAULT = 6,
-    PROCESS_LIMIT_DEFAULT = 1,
-    OUTPUT_LIMIT_DEFAULT = 100000000,
+    TIME_LIMIT_DEFAULT = 4,  //cpu实践限制，默认为4s
+    MEMORY_LIMIT_DEFAULT = 1024 * 64, // 限制默认内存为64mb
+    WALL_MEMORY_DEFAULT = 1024 * 1024 * 3L, // 内存硬限制，请参考child.c
+    WALL_TIME_DEFAULT = 6,  // 实际时间限制，默认为4s
+    PROCESS_LIMIT_DEFAULT = 1, // 进程限制，貌似没啥用？
+    OUTPUT_LIMIT_DEFAULT = 20000,  // 输出限制，默认为20000
 };
 
 struct timeoutkillerConfig {
@@ -38,6 +40,7 @@ struct timeoutkillerConfig {
 struct execConfig {
     rlim_t cpuTimeLimit;
     rlim_t memoryLimit;
+    rlim_t wallMemoryLimit;
     rlim_t processLimit;
     rlim_t outputLimit;
     rlim_t realTimeLimit;

@@ -15,9 +15,18 @@
  */
 
 void setLimitation(struct execConfig *execConfig) {
-    // 内存超限
+    /* 内存超限
+     * 经过测试发现，内存的限制的精确度较低，我们可以在这里限制一个较大的内存（默认设置了128mb，一般无需更改）
+     * 我们可以采用如下的方案，
+     * 为了安全性，硬限制内存确实需要，但是做不到像限制时间那样完美
+     * 所以我们先为程序设置一个较大的限制值，
+     * 这个限制值能让用户的代码完整地正常运行
+     * 同时又不会因为各种奇奇怪怪的情况退出
+     * 程序运行完成之后我们再来进行比对
+     */
     struct rlimit maxMemory;
-    maxMemory.rlim_cur = maxMemory.rlim_max = execConfig->memoryLimit;
+    // kb to bytes
+    maxMemory.rlim_cur = maxMemory.rlim_max = (execConfig->wallMemoryLimit) * 1024;
 
     if (setrlimit(RLIMIT_AS, &maxMemory) != 0) {
         CHILD_EXIT(SET_LIMIT_ERROR);

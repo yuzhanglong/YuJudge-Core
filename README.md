@@ -128,7 +128,7 @@ sudo ./y-judger
 enum RUNNING_CONDITION {
     RUN_SUCCESS = 1, // 程序通过
     RUNTIME_ERROR, // 运行时错误
-    TIME_LIMIT_EXCEEDED, // 时间超限
+    TIME_LIMIT_EXCEED, // 时间超限
     MEMORY_LIMIT_EXCEED, // 内存超限
     OUTPUT_LIMIT_EXCEED, // 输出超过限制
     SEGMENTATION_FAULT,  // 段错误

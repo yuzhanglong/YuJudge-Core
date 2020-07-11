@@ -39,28 +39,34 @@ enum RUNNING_CONDITION getRunningConditon(int status, struct rusage costResource
     // 正常终止 主动抛出的exit都会到这里来
     if (WIFEXITED(status)) {
         // 注意：此处的accept并不是真正的accept
-        return WEXITSTATUS(status) == 0 ? RUN_SUCCESS : WEXITSTATUS(status);
+        // 对于和期望输出比对的业务逻辑
+        // 我们交给调动者（判题服务器）来实现
+        if (WEXITSTATUS(status) == 0) {
+            // 判断内存限制，在child.c中有对此处的解释
+            // ru_maxrss的单位为kb
+            if ((unsigned long long)(costResource.ru_maxrss) > execConfig -> memoryLimit) {
+                return MEMORY_LIMIT_EXCEED;
+            }
+            return RUN_SUCCESS;
+        }
+        return WEXITSTATUS(status);
     }
     // 异常终止
     if (WIFSIGNALED(status)) {
         if (WTERMSIG(status) == SIGXCPU) {
-            return TIME_LIMIT_EXCEEDED;
+            return TIME_LIMIT_EXCEED;
         }
         if (WTERMSIG(status) == SIGFPE) {
             return FLOAT_ERROR;
         }
         if (WTERMSIG(status) == SIGSEGV) {
-            //内存超限也需要在这里处理
-            if (execConfig->memoryLimit < costResource.ru_maxrss) {
-                return MEMORY_LIMIT_EXCEED;
-            }
             return SEGMENTATION_FAULT;
         }
         if (WTERMSIG(status) == SIGKILL) {
             // 经测试 cpu的时间超限也会出现在此处
             int cpuTime = (int) (costResource.ru_utime.tv_sec * 1000 + costResource.ru_utime.tv_usec / 1000);
             if (execConfig->cpuTimeLimit < cpuTime) {
-                return TIME_LIMIT_EXCEEDED;
+                return TIME_LIMIT_EXCEED;
             }
             return RUNTIME_ERROR;
         }
