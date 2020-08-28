@@ -124,7 +124,7 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
             case 'h':
                 showUsage();
                 return 0;
-            case '?':
+            default:
                 printf("Unknown option: %c\n", (char) optopt);
                 return 0;
         }

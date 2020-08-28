@@ -1,14 +1,6 @@
-/**
- *  @author:yuzhanglong
- *  @email:yuzl1123@163.com
- *  @version: demo-test
- *
- *  项目日志记录模块
- */
 #include <time.h>
 #include <stdio.h>
 #include "logger.h"
-
 
 /**
  * @author yzl

@@ -52,7 +52,7 @@ y-judger
 
 本程序执行用户的代码，并向标准输出定位到用户提供的文件路径中，并返回结果。
 
-【存疑】值得注意的是，我没有将**stdout**文件和出题者提供的xxx.out文件来进行比对，我觉得这一步交给**调用者**（judgehost）比较好。当然，实现这一功能也非常简单，只需执行以下脚本，你只需传入需要比对文件的**路径**即可。
+【存疑】值得注意的是，我没有将**stdout**文件和出题者提供的xxx.out文件来进行比对，我觉得这一步交给**调用者**（judgeHost）比较好。当然，实现这一功能也非常简单，只需执行以下脚本，你只需传入需要比对文件的**路径**即可。
 
 ```sh
 #!/bin/sh
@@ -96,7 +96,7 @@ cmake ..
 make
 ```
 
-执行 `make` 命令会在 `build` 目录下编译生成可执行文件：y-judger
+执行 `make` 命令会在 `build` 目录下编译生成可执行文件：y-judge
 
 ### 运行
 
@@ -137,7 +137,7 @@ enum RUNNING_CONDITION {
     INPUT_FILE_NOT_FOUND, // 找不到输入文件
     CAN_NOT_MAKE_OUTPUT, // 无法寻找输出
     SET_LIMIT_ERROR, // 设限失败
-    UNROOT_USER,  // 非管理员用户
+    NOT_ROOT_USER,  // 非管理员用户
     FORK_ERROR, //fork失败
     CREATE_THREAD_ERROR, //监控线程创建失败
     VALIDATE_ERROR // 数据验证失败
@@ -150,17 +150,17 @@ enum RUNNING_CONDITION {
 
 ## 对一些实践方案的思考
 
-下面的方案我将会去一一实践，目前还停留在理论阶段。
 
-一个**onlinejudge**的基本架构应该如下图所示：
+
+一个**onlineJudge**的基本架构应该如下图所示：
 
 ![image-20200621002852899](https://github.com/yuzhanglong/YuJudge-Core/blob/master/example/1.png)
 
-### 封装 -- 在Judgehost下运行本程序
+### 封装 -- 在JudgeHost下运行本程序
 
 本程序可以**单独执行**（仅限于开发者调试）。执行者传入一系列参数（时间限制、内存限制、可执行文件路径、stdout/in/err输出路径等）即可完成一次判题流程。
 
-在生产环境下，**本程序**就是上图中**judgehost**的**核心部分**，每个**judgehost**可以调用本程序来进行判题（当然，judgehost使用何框架、语言，这个可以自由选择，接下来我准备用Springboot来完成judgehost）
+在生产环境下，**本程序**就是上图中**judgeHost**的**核心部分**，每个**judgeHost**可以调用本程序来进行判题（当然，judgeHost使用何框架、语言，这个可以自由选择，接下来我准备用Springboot来完成judgehost）
 
 **judgeHost**向**judgeServer**暴露API，**接受用户的提交**，**编译用户的代码**，**生成相应的运行脚本（编译失败无需执行）**，然后**多次/并行执行本程序**，让本程序来执行运行脚本即可（编译失败无需执行），即可实现一次判题。
 
@@ -168,11 +168,11 @@ enum RUNNING_CONDITION {
 
 ### 集群 -- 多个JudgeHost
 
-为了提高效率，可能需要多个judgehost，用于处理**大量用户在某个时间段提交**的情况，针对此，judgeserver可能要维护一个**队列**，根据用户提交的顺序、每个**judgehost**的“**是否忙碌**”状态来处理用户提交的代码。
+为了提高效率，可能需要多个judgeHost，用于处理**大量用户在某个时间段提交**的情况，针对此，judgeServer可能要维护一个**队列**，根据用户提交的顺序、每个**judgehost**的“**是否忙碌**”状态来处理用户提交的代码。
 
 
 
-### 多线程 -- 在judgehost内并行执行本程序
+### 多线程 -- 在judgeHost内并行执行本程序
 
 线程是实现并发机制的一种有效手段。进程和线程一样，都是实现并发的一个基本单位。线程是比进程更小的执行单位，线程是进程的基础之上进行进一步的划分。所谓多线程是指一个进程在执行过程中可以产生多个更小的程序单元，这些更小的单元称为线程。
 
@@ -212,8 +212,8 @@ python3 /Users/yuzhanglong/Desktop/y-judger/tests/hello/hello-python/hello.py
 | **How does Online Judge Work?**                              | https://www.linkedin.com/pulse/how-does-online-judge-works-ahmad-faiyaz |
 | **How do I implement an online judge or autograder that both can be completed in 1–2 months and that is similar to CodeChef, TopCoder, etc. from scratch？** | https://www.quora.com/How-do-I-implement-an-online-judge-or-autograder-that-both-can-be-completed-in-1%E2%80%932-months-and-that-is-similar-to-CodeChef-TopCoder-etc-from-scratch](https://www.quora.com/How-do-I-implement-an-online-judge-or-autograder-that-both-can-be-completed-in-1–2-months-and-that-is-similar-to-CodeChef-TopCoder-etc-from-scratch |
 | **CLion 实现远程调试**                                       | https://blog.csdn.net/lihao21/article/details/87425187?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase |
-| **domjudge代码**                                             | https://github.com/DOMjudge/domjudge                         |
-| **青岛大学onlinejudge源代码**                                | https://github.com/QingdaoU/OnlineJudge                      |
+| **domJudge代码**                                             | https://github.com/DOMjudge/domjudge                         |
+| **青岛大学onlineJudge源代码**                                | https://github.com/QingdaoU/OnlineJudge                      |
 
 
 

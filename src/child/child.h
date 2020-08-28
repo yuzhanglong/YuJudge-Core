@@ -1,7 +1,3 @@
-//
-// Created by yuzhanglong on 2020/6/19.
-//
-
 #ifndef Y_JUDGER_CHILD_H
 #define Y_JUDGER_CHILD_H
 

@@ -1,13 +1,9 @@
-//
-// Created by yuzhanglong on 2020/6/19.
-//
-
-#include "timeHelper.h"
+#include "time.h"
 #include <sys/time.h>
 
 /**
  * @author yzl
- * @param timeval: timeval结构体
+ * @param timeval: timeval 结构体
  * @return long 总毫秒数
  */
 

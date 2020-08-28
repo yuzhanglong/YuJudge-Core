@@ -16,7 +16,7 @@ enum RUNNING_CONDITION {
     INPUT_FILE_NOT_FOUND, // 找不到输入文件
     CAN_NOT_MAKE_OUTPUT, // 无法寻找输出
     SET_LIMIT_ERROR,
-    UNROOT_USER,  // 非管理员用户
+    NOT_ROOT_USER,  // 非管理员用户
     FORK_ERROR, //fork失败
     CREATE_THREAD_ERROR, //监控线程创建失败
     VALIDATE_ERROR // 数据验证失败
