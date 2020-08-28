@@ -5,19 +5,21 @@
 #include <pthread.h>
 #include <sys/wait.h>
 #include "../child/child.h"
-#include "../timeHelper/timeHelper.h"
-#include "../sysHelper/sysHelper.h"
+#include "../time/time.h"
+#include "../system/system.h"
 #include "../logger/logger.h"
-#include "judger.h"
+#include "judge.h"
 
 /**
- * @author yzl
- * @return void *
  * 创建一个监控线程
+ *
+ * @author yzl
+ * @param timeoutKillerConfig 超时状态配置
+ * @return void *
  */
 
-void *monitorThread(void *timeoutkillerConfig) {
-    struct timeoutkillerConfig *timeConf = (struct timeoutkillerConfig *) (timeoutkillerConfig);
+void *monitorThread(void *timeoutKillerConfig) {
+    struct timeoutkillerConfig *timeConf = (struct timeoutkillerConfig *) (timeoutKillerConfig);
     // 单独的线程 用来在超时的时候杀死进程 防止超时
     pid_t pid = timeConf->pid;
     int limitTime = timeConf->limitTime;
@@ -27,30 +29,38 @@ void *monitorThread(void *timeoutkillerConfig) {
 }
 
 /**
+ * 获取子进程运行状态，应该在wait之后调用
+ *
  * @author yzl
  * @param status 子进程状态，一般通过wait4得到
- * @param costResource 进程资源消耗结构体，一般通过wait4得到
+ * @param judgeResult 运行结果
  * @param execConfig 用户提供的运行的配置
  * @return enum RUNNING_CONDITION *
- * 获取子进程运行状态，应该在wait之后调用
  */
 
-enum RUNNING_CONDITION getRunningConditon(int status, struct rusage costResource, struct execConfig *execConfig) {
+enum RUNNING_CONDITION getRunningCondition(int status, struct execConfig *execConfig, struct judgeResult *judgeResult) {
     // 正常终止 主动抛出的exit都会到这里来
     if (WIFEXITED(status)) {
-        // 注意：此处的accept并不是真正的accept
         // 对于和期望输出比对的业务逻辑
         // 我们交给调动者（判题服务器）来实现
         if (WEXITSTATUS(status) == 0) {
-            // 判断内存限制，在child.c中有对此处的解释
-            // ru_maxrss的单位为kb
-            if ((unsigned long long)(costResource.ru_maxrss) > execConfig -> memoryLimit) {
+            // 细粒度判断内存限制，通过杀进程的方式并不准确，详见child.c文件
+            int isMemoryExceeded = (unsigned long long) (judgeResult->memoryCost) > execConfig->memoryLimit;
+            if (isMemoryExceeded) {
                 return MEMORY_LIMIT_EXCEED;
+            }
+
+            // 细粒度的时间限制(ms)
+            int isCpuTimeExceeded = execConfig->cpuTimeLimit < judgeResult->cpuTimeCost;
+            int isRealTimeExceeded = execConfig->realTimeLimit < judgeResult->realTimeCost;
+            if (isCpuTimeExceeded || isRealTimeExceeded) {
+                return TIME_LIMIT_EXCEED;
             }
             return RUN_SUCCESS;
         }
-        return WEXITSTATUS(status);
+        return UNKNOWN_ERROR;
     }
+
     // 异常终止
     if (WIFSIGNALED(status)) {
         if (WTERMSIG(status) == SIGXCPU) {
@@ -64,8 +74,7 @@ enum RUNNING_CONDITION getRunningConditon(int status, struct rusage costResource
         }
         if (WTERMSIG(status) == SIGKILL) {
             // 经测试 cpu的时间超限也会出现在此处
-            int cpuTime = (int) (costResource.ru_utime.tv_sec * 1000 + costResource.ru_utime.tv_usec / 1000);
-            if (execConfig->cpuTimeLimit < cpuTime) {
+            if (execConfig->cpuTimeLimit < judgeResult->cpuTimeCost) {
                 return TIME_LIMIT_EXCEED;
             }
             return RUNTIME_ERROR;
@@ -79,21 +88,22 @@ enum RUNNING_CONDITION getRunningConditon(int status, struct rusage costResource
 
 
 /**
+ * 运行程序, 写入运行结果
  * @author yzl
- * @param judgeResult 最终运行结果
- * @param execConfig 用户提供的运行的配置
+ * @param  judgeResult 最终运行结果
+ * @param  execConfig 用户提供的运行的配置
  * @return void
- * 运行程序， 写入运行结果
  */
 
-void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
+void runJudge(struct execConfig *execConfig, struct judgeResult *judgeResult) {
     struct timeval startTime, endTime;
     gettimeofday(&startTime, NULL);
     if (!isRoot()) {
         makeLog(WARNING, "非root用户", execConfig->loggerFile);
-        judgeResult->condition = UNROOT_USER;
+        judgeResult->condition = NOT_ROOT_USER;
         return;
     }
+
     pid_t childPid = fork();
     pthread_t pthread = 0;
 
@@ -103,6 +113,7 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         judgeResult->condition = FORK_ERROR;
         return;
     }
+
     if (childPid == 0) {
         runChild(execConfig);
     }
@@ -125,19 +136,18 @@ void runJudger(struct execConfig *execConfig, struct judgeResult *judgeResult) {
 
         // 等待孩子进程执行 孩子被杀死或者正常执行都会走到这里
         wait4(childPid, &status, WSTOPPED, &costResource);
+
         // 销毁监控进程
         pthread_cancel(pthread);
         makeLog(DEBUG, "监控线程被销毁", execConfig->loggerFile);
-
         gettimeofday(&endTime, NULL);
-        int timeCostInMillisecond = getGapMillsecond(startTime, endTime);
 
-        // cpu时间/ 注意和真实时间区分
-        int cpuTime = (int) (costResource.ru_utime.tv_sec * 1000 + costResource.ru_utime.tv_usec / 1000);
-        judgeResult->cpuTimeCost = cpuTime;
-        judgeResult->realTimeCost = timeCostInMillisecond;
-        judgeResult->condition = getRunningConditon(status, costResource, execConfig);
-        //WARNING：ru_maxrss的值在mac和linux有区别！
+        // cpu时间 注意和真实时间区分
+        judgeResult->cpuTimeCost = (int) getTimeMillisecondByTimeval(costResource.ru_utime);
+        judgeResult->realTimeCost = getGapMillsecond(startTime, endTime);
+        //WARNING：该值在mac和linux系统上是有区别的！
         judgeResult->memoryCost = costResource.ru_maxrss;
+        judgeResult->condition = getRunningCondition(status, execConfig, judgeResult);
+
     }
 }

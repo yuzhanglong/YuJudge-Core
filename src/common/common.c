@@ -13,8 +13,8 @@
 void showUsage() {
     printf("\n[限制相关]\n");
     printf("\
-  -t,     限制实际时间为t秒，请注意和cpu时间区分\n\
-  -c,     限制cpu时间为t秒\n\
+  -t,     限制实际时间为t毫秒，请注意和cpu时间区分\n\
+  -c,     限制cpu时间为t毫秒\n\
   -m,     限制运行内存为mKB\n\
   -f,     限制代码最大输出为fB\n");
 

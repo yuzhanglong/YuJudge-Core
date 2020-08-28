@@ -24,6 +24,7 @@ void setLimitation(struct execConfig *execConfig) {
      * 同时又不会因为各种奇奇怪怪的情况退出
      * 程序运行完成之后我们再来进行比对
      */
+
     struct rlimit maxMemory;
     // kb to bytes
     maxMemory.rlim_cur = maxMemory.rlim_max = (execConfig->wallMemoryLimit) * 1024;
@@ -32,9 +33,9 @@ void setLimitation(struct execConfig *execConfig) {
         CHILD_EXIT(SET_LIMIT_ERROR);
     }
 
-    // 时间超限
+    // 时间超限，传入毫秒单位，我们将其转成setrlimit要求的秒单位，并进位(粗略)
     struct rlimit maxTime;
-    maxTime.rlim_cur = maxTime.rlim_max = execConfig->cpuTimeLimit;
+    maxTime.rlim_cur = maxTime.rlim_max = (execConfig->cpuTimeLimit / 1000) + 1;
     if (setrlimit(RLIMIT_CPU, &maxTime) != 0) {
         CHILD_EXIT(SET_LIMIT_ERROR);
     }
@@ -63,7 +64,6 @@ void setLimitation(struct execConfig *execConfig) {
  */
 
 void runChild(struct execConfig *execConfig) {
-
     FILE *inputFile = NULL;
     FILE *outputFile = NULL;
     FILE *errFile = NULL;
