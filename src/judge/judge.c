@@ -19,7 +19,7 @@
  */
 
 void *monitorThread(void *timeoutKillerConfig) {
-    struct timeoutkillerConfig *timeConf = (struct timeoutkillerConfig *) (timeoutKillerConfig);
+    struct timeoutKillerConfig *timeConf = (struct timeoutKillerConfig *) (timeoutKillerConfig);
     // 单独的线程 用来在超时的时候杀死进程 防止超时
     pid_t pid = timeConf->pid;
     int limitTime = timeConf->limitTime;
@@ -82,6 +82,7 @@ enum RUNNING_CONDITION getRunningCondition(int status, struct execConfig *execCo
         if (WTERMSIG(status) == SIGXFSZ) {
             return OUTPUT_LIMIT_EXCEED;
         }
+        return RUNTIME_ERROR;
     }
     return UNKNOWN_ERROR;
 }
@@ -121,7 +122,7 @@ void runJudge(struct execConfig *execConfig, struct judgeResult *judgeResult) {
     if (childPid > 0) {
         // 父亲进程
         makeLog(DEBUG, "父进程已创建", execConfig->loggerFile);
-        struct timeoutkillerConfig killerConfig;
+        struct timeoutKillerConfig killerConfig;
         killerConfig.limitTime = execConfig->realTimeLimit;
         killerConfig.pid = childPid;
 
@@ -148,6 +149,5 @@ void runJudge(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         //WARNING：该值在mac和linux系统上是有区别的！
         judgeResult->memoryCost = costResource.ru_maxrss;
         judgeResult->condition = getRunningCondition(status, execConfig, judgeResult);
-
     }
 }

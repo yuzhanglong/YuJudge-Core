@@ -53,6 +53,7 @@ void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeRes
     execConfig->loggerPath = "\0";
     execConfig->execPath = "\0";
     execConfig->loggerFile = NULL;
+    execConfig->isSetSeccomp = 0;
     judgeResult->condition = 1;
     judgeResult->memoryCost = 0;
     judgeResult->realTimeCost = 0;
@@ -79,13 +80,15 @@ int validateForExecConfig(struct execConfig *execConfig) {
 }
 
 /**
+ * 获取用户配置，并设置用户配置
+ *
  * @author yzl
  * @param argc 用户传入参数的个数
  * @param argv 用户传入的参数
  * @param execConfig 运行配置
  * @return int 是否设置成功，如果成功，程序将继续执行
- * 获取用户配置，并设置用户配置
  */
+
 int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
     int opt;
     if (argc == 1) {
@@ -121,6 +124,8 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
             case 'l':
                 execConfig->loggerPath = optarg;
                 execConfig->loggerFile = fopen(execConfig->loggerPath, "w");
+            case 'g':
+                execConfig->isSetSeccomp = atoi(optarg);
             case 'h':
                 showUsage();
                 return 0;
@@ -131,6 +136,14 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
     }
     return 1;
 }
+
+/**
+ * 运行结束，输出结果
+ *
+ * @author yzl
+ * @param execConfig 运行参数
+ * @param judgeResult 运行结果
+ */
 
 void generateResult(struct execConfig *execConfig, struct judgeResult *judgeResult) {
     // 此处的stdout将被调用者处理 应该以json字符串形式表示

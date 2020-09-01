@@ -1,7 +1,3 @@
-//
-// Created by yuzhanglong on 2020/6/17.
-//
-
 #ifndef Y_JUDGER_LOGGER_H
 #define Y_JUDGER_LOGGER_H
 typedef int logType;

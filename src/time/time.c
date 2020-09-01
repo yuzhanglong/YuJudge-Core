@@ -1,5 +1,4 @@
 #include "time.h"
-#include <sys/time.h>
 
 /**
  * @author yzl

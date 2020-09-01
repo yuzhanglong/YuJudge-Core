@@ -6,6 +6,7 @@
 #include "../guard/guard.h"
 
 #define CHILD_EXIT exit
+#define DEFAULT_USER_ID 2000
 
 /**
  * @author yzl
@@ -24,7 +25,6 @@ void setLimitation(struct execConfig *execConfig) {
      * 同时又不会因为各种奇奇怪怪的情况退出
      * 程序运行完成之后我们再来进行比对
      */
-
     struct rlimit maxMemory;
     // kb to bytes
     maxMemory.rlim_cur = maxMemory.rlim_max = (execConfig->wallMemoryLimit) * 1024;
@@ -68,6 +68,12 @@ void runChild(struct execConfig *execConfig) {
     FILE *outputFile = NULL;
     FILE *errFile = NULL;
 
+    // 设置uid
+    if (setuid(DEFAULT_USER_ID) == -1) {
+        CHILD_EXIT(RUNTIME_ERROR);
+    }
+
+    // 重定向输入
     if (execConfig->stdinPath[0] != '\0') {
         inputFile = fopen(execConfig->stdinPath, "r");
         if (!inputFile) {
@@ -76,6 +82,8 @@ void runChild(struct execConfig *execConfig) {
         int f = fileno(inputFile);
         dup2(f, STDIN_FILENO);
     }
+
+    // 重定向标准输出
     if (execConfig->stdoutPath[0] != '\0') {
         outputFile = fopen(execConfig->stdoutPath, "w");
         if (!outputFile) {
@@ -84,6 +92,8 @@ void runChild(struct execConfig *execConfig) {
         int f2 = fileno(outputFile);
         dup2(f2, STDOUT_FILENO);
     }
+
+    // 重定向错误输出
     if (execConfig->stderrPath[0] != '\0') {
         errFile = fopen(execConfig->stderrPath, "w");
         if (!errFile) {
@@ -92,12 +102,15 @@ void runChild(struct execConfig *execConfig) {
         int f3 = fileno(errFile);
         dup2(f3, STDERR_FILENO);
     }
+
     setLimitation(execConfig);
 
-    // TODO: 目前安全性的实现还有一些问题，暂时注释
-    // setSeccompGuard();
+    if (execConfig->isSetSeccomp == 1) {
+        setSeccompGuard();
+    }
 
+    char *envp[] = {"PATH=/bin", 0};
     // 执行用户的提交
-    execve(execConfig->execPath, NULL, NULL);
+    execve(execConfig->execPath, NULL, envp);
     CHILD_EXIT(EXIT_SUCCESS);
 }

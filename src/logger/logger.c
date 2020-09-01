@@ -45,13 +45,13 @@ void makeLog(logType type, char *content, FILE *loggerFile) {
     /*获取生成日志的时间*/
     outputCurrentTime(loggerFile);
     printf("%s\n", content);
-};
+}
 
 /**
  * @author yzl
  * 初始化日志记录模块
  */
-int initLoggger() {
+int initLogger() {
     //TODO:处理日志文件名、路径 格式等功能
     return 1;
 }

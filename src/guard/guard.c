@@ -1,11 +1,12 @@
 #include "guard.h"
 
-int ALLOW_LIST[] = {
+int FORBIDDEN_LIST[] = {
         // 进程控制
         SCMP_SYS(fork),
         SCMP_SYS(clone),
         SCMP_SYS(vfork),
-        SCMP_SYS(kill)
+        SCMP_SYS(kill),
+        SCMP_SYS(socket)
 };
 
 
@@ -15,7 +16,7 @@ int ALLOW_LIST[] = {
  * 获取白名单的长度
  */
 int getAllowListLength() {
-    int len = sizeof(ALLOW_LIST) / sizeof(int);
+    int len = sizeof(FORBIDDEN_LIST) / sizeof(int);
     return len;
 }
 
@@ -28,7 +29,7 @@ int getAllowListLength() {
 int addSeccompRules(scmp_filter_ctx ctx) {
     int len = getAllowListLength();
     for (int i = 0; i < len; i++) {
-        if (seccomp_rule_add(ctx, SCMP_ACT_KILL, ALLOW_LIST[i], 0) != 0) {
+        if (seccomp_rule_add(ctx, SCMP_ACT_KILL, FORBIDDEN_LIST[i], 0) != 0) {
             return 0;
         }
     }

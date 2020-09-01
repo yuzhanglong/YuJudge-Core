@@ -23,16 +23,16 @@ enum RUNNING_CONDITION {
 };
 
 // 对于内存限制的一些实践和解释请参考child.c
-enum EXEC_SETTIN_DEFAULT {
+enum EXEC_SETTING_DEFAULT {
     TIME_LIMIT_DEFAULT = 4,  //cpu实践限制，默认为4s
     MEMORY_LIMIT_DEFAULT = 1024 * 64, // 限制默认内存为64mb
     WALL_MEMORY_DEFAULT = 1024 * 1024 * 3L, // 内存硬限制，请参考child.c
     WALL_TIME_DEFAULT = 6,  // 实际时间限制，默认为4s
-    PROCESS_LIMIT_DEFAULT = 1, // 进程限制，貌似没啥用？
+    PROCESS_LIMIT_DEFAULT = 10, // 进程限制
     OUTPUT_LIMIT_DEFAULT = 20000,  // 输出限制，默认为20000
 };
 
-struct timeoutkillerConfig {
+struct timeoutKillerConfig {
     int pid;
     int limitTime;
 };
@@ -50,6 +50,7 @@ struct execConfig {
     char *stderrPath;
     char *loggerPath;
     FILE *loggerFile;
+    int isSetSeccomp;
 };
 
 struct judgeResult {
