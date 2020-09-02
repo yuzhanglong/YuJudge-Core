@@ -53,7 +53,7 @@ void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeRes
     execConfig->loggerPath = "\0";
     execConfig->execPath = "\0";
     execConfig->loggerFile = NULL;
-    execConfig->isSetSeccomp = 0;
+    execConfig->isGuard = "\0";
     judgeResult->condition = 1;
     judgeResult->memoryCost = 0;
     judgeResult->realTimeCost = 0;
@@ -95,7 +95,7 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
         showUsage();
         return 0;
     }
-    while ((opt = getopt(argc, argv, "t:c:m:f:o:e:i:r:l:h")) != -1) {
+    while ((opt = getopt(argc, argv, "t:c:m:f:o:e:i:r:l:h:g")) != -1) {
         switch (opt) {
             case 't':
                 execConfig->realTimeLimit = atoi(optarg);
@@ -124,8 +124,10 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
             case 'l':
                 execConfig->loggerPath = optarg;
                 execConfig->loggerFile = fopen(execConfig->loggerPath, "w");
+                break;
             case 'g':
-                execConfig->isSetSeccomp = atoi(optarg);
+                execConfig->isGuard = optarg;
+                break;
             case 'h':
                 showUsage();
                 return 0;

@@ -55,6 +55,14 @@ void setLimitation(struct execConfig *execConfig) {
     if (setrlimit(RLIMIT_FSIZE, &maxOutput) != 0) {
         CHILD_EXIT(SET_LIMIT_ERROR);
     }
+
+    // 堆栈
+    struct rlimit maxStack;
+    maxStack.rlim_cur = maxStack.rlim_max = RLIM_INFINITY;
+    if (setrlimit(RLIMIT_STACK, &maxStack) != 0) {
+        CHILD_EXIT(SET_LIMIT_ERROR);
+    }
+
 }
 
 /**
@@ -98,16 +106,16 @@ void runChild(struct execConfig *execConfig) {
         int f3 = fileno(errFile);
         dup2(f3, STDERR_FILENO);
     }
-    setLimitation(execConfig);
 
-    if (execConfig->isSetSeccomp) {
-        setSeccompGuard();
-    }
+    setLimitation(execConfig);
 
     // 设置uid
     if (setuid(DEFAULT_USER_ID) == -1) {
         CHILD_EXIT(RUNTIME_ERROR);
     }
+
+    // still some bug
+//    setSeccompGuard();
 
     char *envp[] = {"PATH=/bin", 0};
     // 执行用户的提交

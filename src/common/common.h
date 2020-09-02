@@ -50,7 +50,7 @@ struct execConfig {
     char *stderrPath;
     char *loggerPath;
     FILE *loggerFile;
-    int isSetSeccomp;
+    char *isGuard;
 };
 
 struct judgeResult {
