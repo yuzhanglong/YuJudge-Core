@@ -17,7 +17,8 @@
 
 void setLimitation(struct execConfig *execConfig) {
     /* 内存超限
-     * 经过测试发现，内存的限制的精确度较低，我们可以在这里限制一个较大的内存（默认设置了128mb，一般无需更改）
+     * 经过测试发现，内存的限制的精确度较低，
+     * 我们可以在这里限制一个较大的内存（默认设置了128mb，一般无需更改）
      * 我们可以采用如下的方案，
      * 为了安全性，硬限制内存确实需要，但是做不到像限制时间那样完美
      * 所以我们先为程序设置一个较大的限制值，
@@ -68,11 +69,6 @@ void runChild(struct execConfig *execConfig) {
     FILE *outputFile = NULL;
     FILE *errFile = NULL;
 
-    // 设置uid
-    if (setuid(DEFAULT_USER_ID) == -1) {
-        CHILD_EXIT(RUNTIME_ERROR);
-    }
-
     // 重定向输入
     if (execConfig->stdinPath[0] != '\0') {
         inputFile = fopen(execConfig->stdinPath, "r");
@@ -102,11 +98,15 @@ void runChild(struct execConfig *execConfig) {
         int f3 = fileno(errFile);
         dup2(f3, STDERR_FILENO);
     }
-
     setLimitation(execConfig);
 
-    if (execConfig->isSetSeccomp == 1) {
+    if (execConfig->isSetSeccomp) {
         setSeccompGuard();
+    }
+
+    // 设置uid
+    if (setuid(DEFAULT_USER_ID) == -1) {
+        CHILD_EXIT(RUNTIME_ERROR);
     }
 
     char *envp[] = {"PATH=/bin", 0};

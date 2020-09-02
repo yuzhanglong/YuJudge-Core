@@ -28,7 +28,7 @@ enum EXEC_SETTING_DEFAULT {
     MEMORY_LIMIT_DEFAULT = 1024 * 64, // 限制默认内存为64mb
     WALL_MEMORY_DEFAULT = 1024 * 1024 * 3L, // 内存硬限制，请参考child.c
     WALL_TIME_DEFAULT = 6,  // 实际时间限制，默认为4s
-    PROCESS_LIMIT_DEFAULT = 10, // 进程限制
+    PROCESS_LIMIT_DEFAULT = 100, // 进程限制
     OUTPUT_LIMIT_DEFAULT = 20000,  // 输出限制，默认为20000
 };
 
