@@ -4,21 +4,9 @@ int FORBIDDEN_LIST[] = {
         // 进程控制
         SCMP_SYS(fork),
         SCMP_SYS(clone),
-        SCMP_SYS(vfork),
-        SCMP_SYS(kill),
-        SCMP_SYS(socket)
+        SCMP_SYS(vfork)
 };
 
-
-/**
- * @author yzl
- * @return int
- * 获取白名单的长度
- */
-int getAllowListLength() {
-    int len = sizeof(FORBIDDEN_LIST) / sizeof(int);
-    return len;
-}
 
 /**
  * @author yzl
@@ -27,7 +15,7 @@ int getAllowListLength() {
  * 添加限制规则
  */
 int addSeccompRules(scmp_filter_ctx ctx) {
-    int len = getAllowListLength();
+    int len = sizeof(FORBIDDEN_LIST) / sizeof(int);
     for (int i = 0; i < len; i++) {
         if (seccomp_rule_add(ctx, SCMP_ACT_KILL, FORBIDDEN_LIST[i], 0) != 0) {
             return 0;
@@ -45,7 +33,7 @@ void setSeccompGuard() {
     scmp_filter_ctx ctx;
     ctx = seccomp_init(SCMP_ACT_ALLOW);
     if (!ctx) {
-        //TODO：限制失效
+        //TODO：限制失效处理
     }
     addSeccompRules(ctx);
     seccomp_load(ctx);

@@ -2,6 +2,7 @@
 #define Y_JUDGER_COMMON_H
 
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/resource.h>
 
 enum RUNNING_CONDITION {
@@ -30,6 +31,8 @@ enum EXEC_SETTING_DEFAULT {
     WALL_TIME_DEFAULT = 6,  // 实际时间限制，默认为4s
     PROCESS_LIMIT_DEFAULT = 100, // 进程限制
     OUTPUT_LIMIT_DEFAULT = 20000,  // 输出限制，默认为20000
+    UID_DEFAULT = 3000,
+    GUARD_DEFAULT = 0
 };
 
 struct timeoutKillerConfig {
@@ -50,7 +53,8 @@ struct execConfig {
     char *stderrPath;
     char *loggerPath;
     FILE *loggerFile;
-    char *isGuard;
+    uid_t uid;
+    int guard;
 };
 
 struct judgeResult {

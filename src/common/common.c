@@ -46,6 +46,8 @@ void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeRes
     execConfig->processLimit = PROCESS_LIMIT_DEFAULT;
     execConfig->outputLimit = OUTPUT_LIMIT_DEFAULT;
     execConfig->wallMemoryLimit = WALL_MEMORY_DEFAULT;
+    execConfig->uid = UID_DEFAULT;
+    execConfig->guard = GUARD_DEFAULT;
     execConfig->execPath = "\0";
     execConfig->stderrPath = "\0";
     execConfig->stdoutPath = "\0";
@@ -53,7 +55,6 @@ void initExecConfigAndJudgeResult(struct execConfig *execConfig, struct judgeRes
     execConfig->loggerPath = "\0";
     execConfig->execPath = "\0";
     execConfig->loggerFile = NULL;
-    execConfig->isGuard = "\0";
     judgeResult->condition = 1;
     judgeResult->memoryCost = 0;
     judgeResult->realTimeCost = 0;
@@ -95,7 +96,7 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
         showUsage();
         return 0;
     }
-    while ((opt = getopt(argc, argv, "t:c:m:f:o:e:i:r:l:h:g")) != -1) {
+    while ((opt = getopt(argc, argv, "t:c:m:f:o:e:i:r:l:h:u:g:p:")) != -1) {
         switch (opt) {
             case 't':
                 execConfig->realTimeLimit = atoi(optarg);
@@ -125,8 +126,14 @@ int getAndSetOptions(int argc, char *argv[], struct execConfig *execConfig) {
                 execConfig->loggerPath = optarg;
                 execConfig->loggerFile = fopen(execConfig->loggerPath, "w");
                 break;
+            case 'u':
+                execConfig->uid = atoi(optarg);
+                break;
             case 'g':
-                execConfig->isGuard = optarg;
+                execConfig->guard = atoi(optarg);
+                break;
+            case 'p':
+                execConfig->processLimit = atoi(optarg);
                 break;
             case 'h':
                 showUsage();

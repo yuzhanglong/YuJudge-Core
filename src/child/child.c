@@ -6,7 +6,6 @@
 #include "../guard/guard.h"
 
 #define CHILD_EXIT exit
-#define DEFAULT_USER_ID 2000
 
 /**
  * @author yzl
@@ -110,12 +109,15 @@ void runChild(struct execConfig *execConfig) {
     setLimitation(execConfig);
 
     // 设置uid
-    if (setuid(DEFAULT_USER_ID) == -1) {
-        CHILD_EXIT(RUNTIME_ERROR);
+    if (execConfig->uid > 0) {
+        if (setuid(execConfig->uid) == -1) {
+            CHILD_EXIT(RUNTIME_ERROR);
+        }
     }
 
-    // still some bug
-//    setSeccompGuard();
+    if (execConfig->guard) {
+        setSeccompGuard();
+    }
 
     char *envp[] = {"PATH=/bin", 0};
     // 执行用户的提交
