@@ -4,7 +4,7 @@
 # 本程序不负责对比，只负责运行用户代码并输出
 # 具体的对比或者specialJudge应该交给调用者处理
 
-# example: ./compare <用户输出> <期望输出>
+# examples: ./compare <用户输出> <期望输出>
 
 
 SUBMISSION_OUTPUT_PATH="$1"

@@ -2,3 +2,4 @@
 cmake-build-debug
 run
 node_modules
+yarn.lock
