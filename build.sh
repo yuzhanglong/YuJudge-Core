@@ -5,7 +5,7 @@ yum -y install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel python3 gcc gc
 
 # 编译可执行文件
 echo '[TIP] 正在编译判题核心 (build/y_judge)'
-mkdir build
+rm -rf build && mkdir build
 cd build || exit
 cmake ..
 make
