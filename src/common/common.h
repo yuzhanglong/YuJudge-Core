@@ -16,7 +16,7 @@ enum RUNNING_CONDITION {
     UNKNOWN_ERROR, // 未知错误
     INPUT_FILE_NOT_FOUND, // 找不到输入文件
     CAN_NOT_MAKE_OUTPUT, // 无法寻找输出
-    SET_LIMIT_ERROR,
+    SET_LIMIT_ERROR, // 设限失败
     NOT_ROOT_USER,  // 非管理员用户
     FORK_ERROR, //fork失败
     CREATE_THREAD_ERROR, //监控线程创建失败
@@ -58,9 +58,13 @@ struct execConfig {
 };
 
 struct judgeResult {
+    // 实际消耗时间
     rlim_t realTimeCost;
+    // 消耗内存
     rlim_t memoryCost;
+    // 消耗 CPU 时间
     rlim_t cpuTimeCost;
+    // 执行状态，请参考 RUNNING_CONDITION 枚举类型
     int condition;
 };
 
