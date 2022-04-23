@@ -123,7 +123,7 @@ void runJudge(struct execConfig *execConfig, struct judgeResult *judgeResult) {
         // 父亲进程
         makeLog(DEBUG, "父进程已创建", execConfig->loggerFile);
         struct timeoutKillerConfig killerConfig;
-        killerConfig.limitTime = execConfig->realTimeLimit;
+        killerConfig.limitTime = execConfig->realTimeLimit / 1000;
         killerConfig.pid = childPid;
 
         // 若线程创建成功，则返回0。若线程创建失败，则返回出错编号
