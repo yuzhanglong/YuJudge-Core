@@ -9,7 +9,7 @@
 
 ## 快速开始
 
-请参阅[用户手册](https://blog.yuzzl.top/docs-yu-judge-core)
+请参阅[用户手册](https://yuzhanglong.feishu.cn/wiki/wikcnb46K9AS8P42aEFxxTKVmac)
 
 ## 它是如何工作的？
 
