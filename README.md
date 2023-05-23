@@ -1,7 +1,5 @@
 # YuJudge-Core
 
-> 近期会推出 N-API 版本，敬请期待~
-
 ## 关于
 
 这是 Online Judge 平台 [YuJudge](https://github.com/yuzhanglong/YuJudge) 的**判题核心**，基于 **C** 编写，支持在 Linux 下运行。
