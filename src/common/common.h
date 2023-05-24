@@ -27,7 +27,7 @@ enum RUNNING_CONDITION {
 enum EXEC_SETTING_DEFAULT {
     TIME_LIMIT_DEFAULT = 4000,  //cpu实践限制，默认为 4000 ms
     MEMORY_LIMIT_DEFAULT = 1024 * 64, // 限制默认内存为64 mb
-    WALL_MEMORY_DEFAULT = 1024 * 1024 * 1L, // 内存硬限制，请参考child.c
+    WALL_MEMORY_DEFAULT = 1024 * 1024 * 3L, // 内存硬限制，请参考child.c
     WALL_TIME_DEFAULT = 4000,  // 实际时间限制，默认为 4000 ms
     PROCESS_LIMIT_DEFAULT = 100, // 进程限制
     OUTPUT_LIMIT_DEFAULT = 20000,  // 输出限制，默认为 20000
